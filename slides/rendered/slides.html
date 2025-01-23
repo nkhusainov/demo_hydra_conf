@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.40">
+
+  <meta name="author" content="Nail Khusainov">
+  <meta name="dcterms.date" content="2025-01-20">
+  <title>Config Management with Hydra – Hydra</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-48797cb27f7bd65a62c7c52236dc3eac.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Hydra</h1>
+  <p class="subtitle">Intro to Hydra</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Nail Khusainov 
+</div>
+</div>
+</div>
+
+  <p class="date">January 20, 2025</p>
+</section>
+<section>
+<section id="hydra.-config-management" class="title-slide slide level1 center">
+<h1>Hydra. Config Management</h1>
+
+</section>
+<section id="hydra" class="slide level2">
+<h2>Hydra</h2>
+
+<img data-src="img/hydra.png" class="quarto-figure quarto-figure-center r-stretch"><div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="0">
+<p>https://hydra.cc/</p>
+<p>Hydra is an open-source Python framework that simplifies the development of research and other complex applications. The key feature is the ability to don’t read this, blahblah blah create a hierarchical blah blahblag realy, don’t read this, it is not that interesting blahblah blah. The name Hydra comes from its ability to run multiple similar jobs - much like a Hydra with multiple heads.</p>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<p><strong>Key features</strong></p>
+<ul>
+<li>Hierarchical configuration composable from multiple sources</li>
+<li>Configuration can be specified or overridden from the command line</li>
+</ul>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<p><strong>When to use it ?</strong></p>
+<ul>
+<li>You can scroll your config-file during 2 seconds</li>
+<li>You are adapting configs according to envs, pipelines, etc.</li>
+<li>It’s only you who understands what is happening in the configs</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="simple-example" class="slide level2">
+<h2>Simple Example</h2>
+<div class="columns">
+<div class="column" style="width:70%;">
+<div class="sourceCode" id="cb1" data-code-line-numbers="1-28|1-3|1-6|1-3,8-11|1-3,13-16|18-20|22-28"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a></a><span class="co"># simple variable definition</span></span>
+<span id="cb1-2"><a></a><span class="fu">var_1</span><span class="kw">:</span><span class="at"> hello</span></span>
+<span id="cb1-3"><a></a><span class="fu">var_2</span><span class="kw">:</span><span class="at"> world</span></span>
+<span id="cb1-4"><a></a></span>
+<span id="cb1-5"><a></a><span class="co"># referencing</span></span>
+<span id="cb1-6"><a></a><span class="fu">var_constr</span><span class="kw">:</span><span class="at"> ${var_1}_${var_2}</span></span>
+<span id="cb1-7"><a></a></span>
+<span id="cb1-8"><a></a><span class="co"># dictionary</span></span>
+<span id="cb1-9"><a></a><span class="fu">my_dict</span><span class="kw">:</span></span>
+<span id="cb1-10"><a></a><span class="at">  </span><span class="fu">key_1</span><span class="kw">:</span><span class="at"> ${var_1}</span></span>
+<span id="cb1-11"><a></a><span class="at">  </span><span class="fu">key_2</span><span class="kw">:</span><span class="at"> ${var_2}</span></span>
+<span id="cb1-12"><a></a></span>
+<span id="cb1-13"><a></a><span class="co"># list</span></span>
+<span id="cb1-14"><a></a><span class="fu">my_list</span><span class="kw">:</span></span>
+<span id="cb1-15"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> ${var_1}</span></span>
+<span id="cb1-16"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> ${var_2}</span></span>
+<span id="cb1-17"><a></a></span>
+<span id="cb1-18"><a></a><span class="co"># env variable</span></span>
+<span id="cb1-19"><a></a><span class="fu">hostname</span><span class="kw">:</span><span class="at"> ${oc.env:HOSTNAME}</span></span>
+<span id="cb1-20"><a></a><span class="fu">password</span><span class="kw">:</span><span class="at"> ${oc.env:PASSWORD}</span></span>
+<span id="cb1-21"><a></a></span>
+<span id="cb1-22"><a></a><span class="co"># environment dependent variables</span></span>
+<span id="cb1-23"><a></a><span class="fu">environment</span><span class="kw">:</span><span class="at"> dev</span></span>
+<span id="cb1-24"><a></a><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb1-25"><a></a><span class="at">  </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-project</span></span>
+<span id="cb1-26"><a></a><span class="at">  </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-project</span></span>
+<span id="cb1-27"><a></a></span>
+<span id="cb1-28"><a></a><span class="fu">gcp_project</span><span class="kw">:</span><span class="at"> ${gcp_project_options.${environment}}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:30%;">
+
+</div></div>
+<p class="heading" id="section"></p>
+</section>
+<section id="simple-example.-access-variables" class="slide level2">
+<h2>Simple Example. Access variables</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment fade-in" data-fragment-index="1">
+<div class="sourceCode" id="cb2" data-fragment-index="2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a></a><span class="co"># src/main.py</span></span>
+<span id="cb2-2"><a></a></span>
+<span id="cb2-3"><a></a><span class="im">import</span> hydra</span>
+<span id="cb2-4"><a></a><span class="im">from</span> omegaconf <span class="im">import</span> DictConfig, OmegaConf</span>
+<span id="cb2-5"><a></a></span>
+<span id="cb2-6"><a></a><span class="at">@hydra.main</span>(</span>
+<span id="cb2-7"><a></a>    version_base<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb2-8"><a></a>    config_path<span class="op">=</span><span class="st">"conf"</span>,</span>
+<span id="cb2-9"><a></a>    config_name<span class="op">=</span><span class="st">"config"</span>,</span>
+<span id="cb2-10"><a></a>)</span>
+<span id="cb2-11"><a></a><span class="kw">def</span> my_app(cfg : DictConfig) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb2-12"><a></a>    OmegaConf.resolve(cfg)</span>
+<span id="cb2-13"><a></a>    <span class="bu">print</span>(OmegaConf.to_yaml(cfg))</span>
+<span id="cb2-14"><a></a></span>
+<span id="cb2-15"><a></a></span>
+<span id="cb2-16"><a></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb2-17"><a></a>    my_app()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="5">
+<p>Simple execution</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource sh number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a></a><span class="ex">python</span> main.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="6">
+<p><strong>Change</strong> or <strong>add</strong> variables at <strong>runtime</strong> !</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource sh number-lines code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a></a><span class="ex">python</span> main.py var_1=bonjour var_2=le_monde</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment fade-in" data-fragment-index="3">
+<p><img data-src="img/ex1_dir_tree.png" class="quarto-figure quarto-figure-center">s</p>
+</div>
+</div></div>
+<p class="heading" id="section-1"></p>
+</section>
+<section id="section-2" class="slide level2">
+<h2></h2>
+
+<img data-src="img/cli_choice.jpg" class="quarto-figure quarto-figure-center r-stretch"><p class="heading" id="section-3"></p>
+</section>
+<section id="realistic-example.-diferent-configs-between-usecases" class="slide level2">
+<h2>Realistic example. Diferent configs between Usecases</h2>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="fragment fade-in" data-fragment-index="1">
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><a></a><span class="co"># CASE 1</span></span>
+<span id="cb5-2"><a></a><span class="co"># src/conf/usecases/case_1.yaml</span></span>
+<span id="cb5-3"><a></a></span>
+<span id="cb5-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb5-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb5-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb5-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb5-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb5-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb5-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb5-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb5-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb5-13"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb5-14"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb5-15"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb5-16"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb5-17"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb5-18"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_2</span></span>
+<span id="cb5-19"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_3</span></span>
+<span id="cb5-20"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_4</span></span>
+<span id="cb5-21"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_5</span></span>
+<span id="cb5-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_6</span></span>
+<span id="cb5-23"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb5-24"><a></a></span>
+<span id="cb5-25"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb5-26"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb5-27"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_2-project</span></span>
+<span id="cb5-28"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_2-project</span></span>
+<span id="cb5-29"><a></a></span>
+<span id="cb5-30"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb5-31"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_2_dataset.features_table"</span></span>
+<span id="cb5-32"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb5-33"><a></a></span>
+<span id="cb5-34"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="fragment fade-in" data-fragment-index="2">
+<div class="sourceCode" id="cb6" data-code-line-numbers="|4-14"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a></a><span class="co"># CASE 2</span></span>
+<span id="cb6-2"><a></a><span class="co"># src/conf/usecases/case_2.yaml</span></span>
+<span id="cb6-3"><a></a></span>
+<span id="cb6-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb6-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb6-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb6-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb6-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb6-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb6-10"><a></a><span class="at">    </span><span class="fu">min_data_in_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">885</span></span>
+<span id="cb6-11"><a></a><span class="at">    </span><span class="fu">min_data_in_leaf</span><span class="kw">:</span><span class="at"> </span><span class="dv">595</span></span>
+<span id="cb6-12"><a></a><span class="at">    </span><span class="fu">num_leaves</span><span class="kw">:</span><span class="at"> </span><span class="dv">475</span></span>
+<span id="cb6-13"><a></a><span class="at">    </span><span class="fu">sigmoid</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.3</span></span>
+<span id="cb6-14"><a></a><span class="at">    </span><span class="fu">num_iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">290</span></span>
+<span id="cb6-15"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb6-16"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb6-17"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb6-18"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb6-19"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb6-20"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_2</span></span>
+<span id="cb6-21"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_3</span></span>
+<span id="cb6-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_4</span></span>
+<span id="cb6-23"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_5</span></span>
+<span id="cb6-24"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_6</span></span>
+<span id="cb6-25"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb6-26"><a></a></span>
+<span id="cb6-27"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb6-28"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb6-29"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_1-project</span></span>
+<span id="cb6-30"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_1-project</span></span>
+<span id="cb6-31"><a></a></span>
+<span id="cb6-32"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb6-33"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_1_dataset.features_table"</span></span>
+<span id="cb6-34"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb6-35"><a></a></span>
+<span id="cb6-36"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div><div class="column" style="width:33%;">
+<div class="fragment fade-in" data-fragment-index="3">
+<div class="sourceCode" id="cb7" data-code-line-numbers="|20-29"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb7-1"><a></a><span class="co"># CASE 3</span></span>
+<span id="cb7-2"><a></a><span class="co"># src/conf/usecases/case_3.yaml</span></span>
+<span id="cb7-3"><a></a></span>
+<span id="cb7-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb7-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb7-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb7-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb7-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb7-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb7-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb7-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb7-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb7-13"><a></a><span class="at">    </span><span class="fu">max_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">107</span></span>
+<span id="cb7-14"><a></a><span class="at">    </span><span class="fu">max_depth</span><span class="kw">:</span><span class="at"> </span><span class="dv">8</span></span>
+<span id="cb7-15"><a></a><span class="at">    </span><span class="fu">min_data_in_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">885</span></span>
+<span id="cb7-16"><a></a><span class="at">    </span><span class="fu">min_data_in_leaf</span><span class="kw">:</span><span class="at"> </span><span class="dv">595</span></span>
+<span id="cb7-17"><a></a><span class="at">    </span><span class="fu">num_leaves</span><span class="kw">:</span><span class="at"> </span><span class="dv">475</span></span>
+<span id="cb7-18"><a></a><span class="at">    </span><span class="fu">sigmoid</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.3</span></span>
+<span id="cb7-19"><a></a><span class="at">    </span><span class="fu">num_iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">290</span></span>
+<span id="cb7-20"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb7-21"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb7-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb7-23"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_2</span></span>
+<span id="cb7-24"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_3</span></span>
+<span id="cb7-25"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_4</span></span>
+<span id="cb7-26"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_5</span></span>
+<span id="cb7-27"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb7-28"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb7-29"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb7-30"><a></a></span>
+<span id="cb7-31"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb7-32"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb7-33"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_3-project</span></span>
+<span id="cb7-34"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_3-project</span></span>
+<span id="cb7-35"><a></a></span>
+<span id="cb7-36"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb7-37"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_3_dataset.features_table"</span></span>
+<span id="cb7-38"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb7-39"><a></a></span>
+<span id="cb7-40"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div></div>
+</section>
+<section id="realistic-example" class="slide level2">
+<h2>Realistic example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment" data-fragment-index="0">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/ex2_dir_tree.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div>
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource sh number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a></a><span class="ex">python</span> main.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="3">
+<p>Importing another config</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource sh number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a></a><span class="ex">python</span> main.py usecase=case_2 environment=prod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment fade-in" data-fragment-index="1">
+<div class="sourceCode" id="cb10" data-fragment-index="2"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb10-1"><a></a><span class="co"># MAIN CONFIG</span></span>
+<span id="cb10-2"><a></a><span class="co"># src/conf/config.yaml</span></span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a><span class="fu">defaults</span><span class="kw">:</span></span>
+<span id="cb10-5"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">usecase</span><span class="kw">:</span><span class="at"> case_1</span></span>
+<span id="cb10-6"><a></a></span>
+<span id="cb10-7"><a></a><span class="fu">environment</span><span class="kw">:</span><span class="at"> ${oc.env:ENVIRONMENT}</span></span>
+<span id="cb10-8"><a></a><span class="fu">gcp_project</span><span class="kw">:</span><span class="at"> ${usecase.pipeline_variables.gcp_project_options.${environment}}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div></div>
+</section>
+<section id="a-more-realistic-example" class="slide level2">
+<h2><strong>A more</strong> realistic example</h2>
+<p>We <strong>don’t want to repeat</strong> the same <strong>config</strong> multiple times.</p>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="sourceCode" id="cb11" data-code-line-numbers="|1-10,13-14,16,23,25-34"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb11-1"><a></a><span class="co"># CASE 1</span></span>
+<span id="cb11-2"><a></a><span class="co"># src/conf/usecases/case_1.yaml</span></span>
+<span id="cb11-3"><a></a></span>
+<span id="cb11-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb11-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb11-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb11-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb11-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb11-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb11-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb11-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb11-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb11-13"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb11-14"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb11-15"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb11-16"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb11-17"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb11-18"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_2</span></span>
+<span id="cb11-19"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_3</span></span>
+<span id="cb11-20"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_4</span></span>
+<span id="cb11-21"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_5</span></span>
+<span id="cb11-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_6</span></span>
+<span id="cb11-23"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb11-24"><a></a></span>
+<span id="cb11-25"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb11-26"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb11-27"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_2-project</span></span>
+<span id="cb11-28"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_2-project</span></span>
+<span id="cb11-29"><a></a></span>
+<span id="cb11-30"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb11-31"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_2_dataset.features_table"</span></span>
+<span id="cb11-32"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb11-33"><a></a></span>
+<span id="cb11-34"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:33%;">
+<div class="sourceCode" id="cb12" data-code-line-numbers="|1-10,18,19,21,28,30-39"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a></a><span class="co"># CASE 2</span></span>
+<span id="cb12-2"><a></a><span class="co"># src/conf/usecases/case_2.yaml</span></span>
+<span id="cb12-3"><a></a></span>
+<span id="cb12-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb12-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb12-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb12-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb12-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb12-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb12-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb12-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb12-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb12-13"><a></a><span class="at">    </span><span class="fu">min_data_in_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">885</span></span>
+<span id="cb12-14"><a></a><span class="at">    </span><span class="fu">min_data_in_leaf</span><span class="kw">:</span><span class="at"> </span><span class="dv">595</span></span>
+<span id="cb12-15"><a></a><span class="at">    </span><span class="fu">num_leaves</span><span class="kw">:</span><span class="at"> </span><span class="dv">475</span></span>
+<span id="cb12-16"><a></a><span class="at">    </span><span class="fu">sigmoid</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.3</span></span>
+<span id="cb12-17"><a></a><span class="at">    </span><span class="fu">num_iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">290</span></span>
+<span id="cb12-18"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb12-19"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb12-20"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb12-21"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb12-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb12-23"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_2</span></span>
+<span id="cb12-24"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_3</span></span>
+<span id="cb12-25"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_4</span></span>
+<span id="cb12-26"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_5</span></span>
+<span id="cb12-27"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_6</span></span>
+<span id="cb12-28"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb12-29"><a></a></span>
+<span id="cb12-30"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb12-31"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb12-32"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_1-project</span></span>
+<span id="cb12-33"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_1-project</span></span>
+<span id="cb12-34"><a></a></span>
+<span id="cb12-35"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb12-36"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_1_dataset.features_table"</span></span>
+<span id="cb12-37"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb12-38"><a></a></span>
+<span id="cb12-39"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:33%;">
+<div class="sourceCode" id="cb13" data-code-line-numbers="|1-10,20,21,27,29,31-40"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb13-1"><a></a><span class="co"># CASE 3</span></span>
+<span id="cb13-2"><a></a><span class="co"># src/conf/usecases/case_3.yaml</span></span>
+<span id="cb13-3"><a></a></span>
+<span id="cb13-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb13-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb13-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb13-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb13-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb13-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb13-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb13-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb13-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb13-13"><a></a><span class="at">    </span><span class="fu">max_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">107</span></span>
+<span id="cb13-14"><a></a><span class="at">    </span><span class="fu">max_depth</span><span class="kw">:</span><span class="at"> </span><span class="dv">8</span></span>
+<span id="cb13-15"><a></a><span class="at">    </span><span class="fu">min_data_in_bin</span><span class="kw">:</span><span class="at"> </span><span class="dv">885</span></span>
+<span id="cb13-16"><a></a><span class="at">    </span><span class="fu">min_data_in_leaf</span><span class="kw">:</span><span class="at"> </span><span class="dv">595</span></span>
+<span id="cb13-17"><a></a><span class="at">    </span><span class="fu">num_leaves</span><span class="kw">:</span><span class="at"> </span><span class="dv">475</span></span>
+<span id="cb13-18"><a></a><span class="at">    </span><span class="fu">sigmoid</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.3</span></span>
+<span id="cb13-19"><a></a><span class="at">    </span><span class="fu">num_iterations</span><span class="kw">:</span><span class="at"> </span><span class="dv">290</span></span>
+<span id="cb13-20"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb13-21"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb13-22"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb13-23"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_2</span></span>
+<span id="cb13-24"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_3</span></span>
+<span id="cb13-25"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_4</span></span>
+<span id="cb13-26"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_5</span></span>
+<span id="cb13-27"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb13-28"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb13-29"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb13-30"><a></a></span>
+<span id="cb13-31"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb13-32"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb13-33"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_3-project</span></span>
+<span id="cb13-34"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_3-project</span></span>
+<span id="cb13-35"><a></a></span>
+<span id="cb13-36"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb13-37"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_3_dataset.features_table"</span></span>
+<span id="cb13-38"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb13-39"><a></a></span>
+<span id="cb13-40"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="a-more-realistic-example.-config-templating" class="slide level2">
+<h2><strong>A more</strong> realistic example. Config Templating</h2>
+<p>We have multiple templates. (e.g Train / Infer)</p>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb14-1"><a></a><span class="co"># DEFAULT CONFIG</span></span>
+<span id="cb14-2"><a></a><span class="co"># src/conf/usecases/default.yaml</span></span>
+<span id="cb14-3"><a></a></span>
+<span id="cb14-4"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb14-5"><a></a><span class="at">  </span><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb14-6"><a></a><span class="at">    </span><span class="fu">objective</span><span class="kw">:</span><span class="at"> binary</span></span>
+<span id="cb14-7"><a></a><span class="at">    </span><span class="fu">is_unbalance</span><span class="kw">:</span><span class="at"> </span><span class="ch">True</span></span>
+<span id="cb14-8"><a></a><span class="at">    </span><span class="fu">extra_trees</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb14-9"><a></a><span class="at">    </span><span class="fu">boosting_type</span><span class="kw">:</span><span class="at"> gbdt</span></span>
+<span id="cb14-10"><a></a><span class="at">    </span><span class="fu">feature_fraction</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.6</span></span>
+<span id="cb14-11"><a></a><span class="at">    </span><span class="fu">feature_fraction_bynode</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.95</span></span>
+<span id="cb14-12"><a></a><span class="at">    </span><span class="fu">learning_rate</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.034744</span></span>
+<span id="cb14-13"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb14-14"><a></a><span class="at">    </span><span class="fu">categorical</span><span class="kw">:</span></span>
+<span id="cb14-15"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_1</span></span>
+<span id="cb14-16"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> cat_2</span></span>
+<span id="cb14-17"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb14-18"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_1</span></span>
+<span id="cb14-19"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_2</span></span>
+<span id="cb14-20"><a></a><span class="at">    </span><span class="fu">target</span><span class="kw">:</span><span class="at"> my_target_column</span></span>
+<span id="cb14-21"><a></a></span>
+<span id="cb14-22"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb14-23"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb14-24"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb14-25"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb14-26"><a></a></span>
+<span id="cb14-27"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb14-28"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb14-29"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb14-30"><a></a></span>
+<span id="cb14-31"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:33%;">
+<div class="sourceCode" id="cb15" data-code-line-numbers="|4-6|8-12|16-17,20-21,23"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb15-1"><a></a><span class="co"># CASE 1</span></span>
+<span id="cb15-2"><a></a><span class="co"># src/conf/usecases/case_1.yaml</span></span>
+<span id="cb15-3"><a></a></span>
+<span id="cb15-4"><a></a><span class="fu">defaults</span><span class="kw">:</span></span>
+<span id="cb15-5"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> default</span></span>
+<span id="cb15-6"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> _self_</span></span>
+<span id="cb15-7"><a></a></span>
+<span id="cb15-8"><a></a><span class="fu">model</span><span class="kw">:</span></span>
+<span id="cb15-9"><a></a><span class="at">  </span><span class="fu">features</span><span class="kw">:</span></span>
+<span id="cb15-10"><a></a><span class="at">    </span><span class="fu">numerical</span><span class="kw">:</span></span>
+<span id="cb15-11"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_3</span></span>
+<span id="cb15-12"><a></a><span class="at">      </span><span class="kw">-</span><span class="at"> num_4</span></span>
+<span id="cb15-13"><a></a></span>
+<span id="cb15-14"><a></a><span class="fu">pipeline_variables</span><span class="kw">:</span></span>
+<span id="cb15-15"><a></a><span class="at">  </span><span class="fu">gcp_project_options</span><span class="kw">:</span></span>
+<span id="cb15-16"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> dev-case_1-project</span></span>
+<span id="cb15-17"><a></a><span class="at">    </span><span class="fu">prod</span><span class="kw">:</span><span class="at"> prod-case_1-project</span></span>
+<span id="cb15-18"><a></a></span>
+<span id="cb15-19"><a></a><span class="at">  </span><span class="fu">options_table_features</span><span class="kw">:</span></span>
+<span id="cb15-20"><a></a><span class="at">    </span><span class="fu">dev</span><span class="kw">:</span><span class="at"> </span><span class="st">"case_1_dataset.features_table"</span></span>
+<span id="cb15-21"><a></a><span class="at">    </span><span class="fu">prd</span><span class="kw">:</span><span class="at"> ${.dev}</span></span>
+<span id="cb15-22"><a></a></span>
+<span id="cb15-23"><a></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">"0 0 * * *"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column" style="width:33%;">
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb16-1"><a></a><span class="co"># MAIN CONFIG</span></span>
+<span id="cb16-2"><a></a><span class="co"># src/conf/config.yaml</span></span>
+<span id="cb16-3"><a></a></span>
+<span id="cb16-4"><a></a><span class="fu">defaults</span><span class="kw">:</span></span>
+<span id="cb16-5"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">usecase</span><span class="kw">:</span><span class="at"> case_1</span></span>
+<span id="cb16-6"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> _self_</span></span>
+<span id="cb16-7"><a></a></span>
+<span id="cb16-8"><a></a><span class="fu">environment</span><span class="kw">:</span><span class="at"> ${oc.env:ENVIRONMENT}</span></span>
+<span id="cb16-9"><a></a><span class="fu">gcp_project</span><span class="kw">:</span><span class="at"> ${usecase.pipeline_variables.gcp_project_options.${environment}}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+<p>Run:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource sh number-lines code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a></a><span class="ex">python</span> main.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p class="heading" id="section-4"></p>
+</section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+
+<img data-src="img/eng_yaml.jpg" class="quarto-figure quarto-figure-center r-stretch"><p class="heading" id="section-6"></p>
+</section>
+<section id="even-more-realistic-example.-config-templating" class="slide level2">
+<h2><strong>Even more</strong> realistic example. Config Templating</h2>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/ex4_dir_tree.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div><div class="column" style="width:66%;">
+<div class="r-stack">
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<p>ZenML Resources. Train</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb18-1"><a></a><span class="co"># conf/default/pipeline_options/train.yaml</span></span>
+<span id="cb18-2"><a></a></span>
+<span id="cb18-3"><a></a><span class="fu">step_configurations</span><span class="kw">:</span></span>
+<span id="cb18-4"><a></a><span class="at">  </span><span class="fu">read_data_fit</span><span class="kw">:</span></span>
+<span id="cb18-5"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-6"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-7"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-8"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-9"><a></a><span class="at">  </span><span class="fu">read_data_test</span><span class="kw">:</span></span>
+<span id="cb18-10"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-11"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-12"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-13"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-14"><a></a><span class="at">  </span><span class="fu">split_data</span><span class="kw">:</span></span>
+<span id="cb18-15"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-16"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-17"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-18"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 256GiB</span></span>
+<span id="cb18-19"><a></a><span class="at">  </span><span class="fu">train_model</span><span class="kw">:</span></span>
+<span id="cb18-20"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-21"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-22"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">32.0</span></span>
+<span id="cb18-23"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 256GiB</span></span>
+<span id="cb18-24"><a></a><span class="at">  </span><span class="fu">infer_model_train</span><span class="kw">:</span></span>
+<span id="cb18-25"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-26"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-27"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-28"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 256GiB</span></span>
+<span id="cb18-29"><a></a><span class="at">  </span><span class="fu">infer_model_test</span><span class="kw">:</span></span>
+<span id="cb18-30"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-31"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-32"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-33"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 256GiB</span></span>
+<span id="cb18-34"><a></a><span class="at">  </span><span class="fu">infer_model_fit</span><span class="kw">:</span></span>
+<span id="cb18-35"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-36"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-37"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-38"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 256GiB</span></span>
+<span id="cb18-39"><a></a><span class="at">  </span><span class="fu">infer_model_validate</span><span class="kw">:</span></span>
+<span id="cb18-40"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-41"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-42"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-43"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-44"><a></a><span class="at">  </span><span class="fu">evaluate_train</span><span class="kw">:</span></span>
+<span id="cb18-45"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-46"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-47"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-48"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-49"><a></a><span class="at">  </span><span class="fu">evaluate_test</span><span class="kw">:</span></span>
+<span id="cb18-50"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-51"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-52"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-53"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-54"><a></a><span class="at">  </span><span class="fu">evaluate_fit</span><span class="kw">:</span></span>
+<span id="cb18-55"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-56"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-57"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-58"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-59"><a></a><span class="at">  </span><span class="fu">evaluate_validate</span><span class="kw">:</span></span>
+<span id="cb18-60"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-61"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-62"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-63"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-64"><a></a><span class="at">  </span><span class="fu">eval_by_snapshot_test</span><span class="kw">:</span></span>
+<span id="cb18-65"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-66"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-67"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-68"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-69"><a></a><span class="at">  </span><span class="fu">eval_by_snapshot_fit</span><span class="kw">:</span></span>
+<span id="cb18-70"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-71"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-72"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">8.0</span></span>
+<span id="cb18-73"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 128GiB</span></span>
+<span id="cb18-74"><a></a><span class="at">  </span><span class="fu">rotate_models</span><span class="kw">:</span></span>
+<span id="cb18-75"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-76"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-77"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0</span></span>
+<span id="cb18-78"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 2GiB</span></span>
+<span id="cb18-79"><a></a><span class="at">  </span><span class="fu">report_overal</span><span class="kw">:</span></span>
+<span id="cb18-80"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb18-81"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb18-82"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="fl">2.0</span></span>
+<span id="cb18-83"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> 2GiB</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="2">
+<p>ZenML Resources. Infer</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb19-1"><a></a><span class="co"># conf/default/pipeline_options/infer.yaml</span></span>
+<span id="cb19-2"><a></a></span>
+<span id="cb19-3"><a></a><span class="fu">step_configurations</span><span class="kw">:</span></span>
+<span id="cb19-4"><a></a><span class="at">  </span><span class="fu">read_data_infer</span><span class="kw">:</span></span>
+<span id="cb19-5"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb19-6"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb19-7"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="dv">8</span></span>
+<span id="cb19-8"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> </span><span class="st">"64GiB"</span></span>
+<span id="cb19-9"><a></a><span class="at">  </span><span class="fu">infer_model</span><span class="kw">:</span></span>
+<span id="cb19-10"><a></a><span class="at">    </span><span class="fu">settings</span><span class="kw">:</span></span>
+<span id="cb19-11"><a></a><span class="at">      </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb19-12"><a></a><span class="at">        </span><span class="fu">cpu_count</span><span class="kw">:</span><span class="at"> </span><span class="dv">8</span></span>
+<span id="cb19-13"><a></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> </span><span class="st">"64GiB"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="3">
+<p>ZenML Docker. Python 3.10</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb20-1"><a></a><span class="co"># conf/default/zenml_settings/3-10.yaml</span></span>
+<span id="cb20-2"><a></a></span>
+<span id="cb20-3"><a></a><span class="fu">docker</span><span class="kw">:</span></span>
+<span id="cb20-4"><a></a><span class="at">  </span><span class="fu">parent_image</span><span class="kw">:</span><span class="at"> </span><span class="st">"path.jfrog.io/.../zenml-adeomlflow-py3.10:0.33.0"</span></span>
+<span id="cb20-5"><a></a><span class="at">  </span><span class="fu">replicate_local_python_environment</span><span class="kw">:</span></span>
+<span id="cb20-6"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"poetry"</span></span>
+<span id="cb20-7"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"export"</span></span>
+<span id="cb20-8"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--without=dev"</span></span>
+<span id="cb20-9"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--extras=vertex"</span></span>
+<span id="cb20-10"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--extras=ds_default"</span></span>
+<span id="cb20-11"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--format=requirements.txt"</span></span>
+<span id="cb20-12"><a></a><span class="at">  </span><span class="fu">dockerignore</span><span class="kw">:</span><span class="at"> </span><span class="st">"../.dockerignore"</span></span>
+<span id="cb20-13"><a></a><span class="at">  </span><span class="fu">install_stack_requirements</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb20-14"><a></a><span class="at">  </span><span class="fu">apt_packages</span><span class="kw">:</span></span>
+<span id="cb20-15"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> libgomp1</span></span>
+<span id="cb20-16"><a></a><span class="at">  </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb20-17"><a></a><span class="at">    </span><span class="fu">PYTHONWARNINGS</span><span class="kw">:</span><span class="at"> </span><span class="st">"ignore"</span></span>
+<span id="cb20-18"><a></a><span class="at">    </span><span class="fu">NUMEXPR_MAX_THREADS</span><span class="kw">:</span><span class="at"> </span><span class="st">"128"</span></span>
+<span id="cb20-19"><a></a><span class="at">    </span><span class="fu">HYDRA_FULL_ERROR</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb20-20"><a></a><span class="at">  </span><span class="fu">source_files</span><span class="kw">:</span><span class="at"> </span><span class="st">"include"</span></span>
+<span id="cb20-21"><a></a><span class="at">  </span><span class="fu">python_package_installer</span><span class="kw">:</span><span class="at"> </span><span class="st">"uv"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="4">
+<p>ZenML Docker. Python 3.11</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb21-1"><a></a><span class="co"># conf/default/zenml_settings/3-11.yaml</span></span>
+<span id="cb21-2"><a></a></span>
+<span id="cb21-3"><a></a><span class="fu">docker</span><span class="kw">:</span></span>
+<span id="cb21-4"><a></a><span class="at">  </span><span class="fu">parent_image</span><span class="kw">:</span><span class="at"> </span><span class="st">"path.jfrog.io/.../zenml-adeomlflow-py3.11:0.33.0"</span></span>
+<span id="cb21-5"><a></a><span class="at">  </span><span class="fu">replicate_local_python_environment</span><span class="kw">:</span></span>
+<span id="cb21-6"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"poetry"</span></span>
+<span id="cb21-7"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"export"</span></span>
+<span id="cb21-8"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--without=dev"</span></span>
+<span id="cb21-9"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--extras=vertex"</span></span>
+<span id="cb21-10"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--extras=ds_default"</span></span>
+<span id="cb21-11"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="st">"--format=requirements.txt"</span></span>
+<span id="cb21-12"><a></a><span class="at">  </span><span class="fu">dockerignore</span><span class="kw">:</span><span class="at"> </span><span class="st">"../.dockerignore"</span></span>
+<span id="cb21-13"><a></a><span class="at">  </span><span class="fu">install_stack_requirements</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb21-14"><a></a><span class="at">  </span><span class="fu">apt_packages</span><span class="kw">:</span></span>
+<span id="cb21-15"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> libgomp1</span></span>
+<span id="cb21-16"><a></a><span class="at">  </span><span class="fu">environment</span><span class="kw">:</span></span>
+<span id="cb21-17"><a></a><span class="at">    </span><span class="fu">PYTHONWARNINGS</span><span class="kw">:</span><span class="at"> </span><span class="st">"ignore"</span></span>
+<span id="cb21-18"><a></a><span class="at">    </span><span class="fu">NUMEXPR_MAX_THREADS</span><span class="kw">:</span><span class="at"> </span><span class="st">"128"</span></span>
+<span id="cb21-19"><a></a><span class="at">    </span><span class="fu">HYDRA_FULL_ERROR</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb21-20"><a></a><span class="at">  </span><span class="fu">source_files</span><span class="kw">:</span><span class="at"> </span><span class="st">"include"</span></span>
+<span id="cb21-21"><a></a><span class="at">  </span><span class="fu">python_package_installer</span><span class="kw">:</span><span class="at"> </span><span class="st">"uv"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="5">
+<p>Pipeline Step Configs. Train</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb22-1"><a></a><span class="co"># conf/default/pipeline_kwargs/train.yaml</span></span>
+<span id="cb22-2"><a></a></span>
+<span id="cb22-3"><a></a><span class="fu">model_id</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb22-4"><a></a><span class="fu">model_stage</span><span class="kw">:</span><span class="at"> Production</span></span>
+<span id="cb22-5"><a></a><span class="fu">model_target_metric</span><span class="kw">:</span><span class="at"> pr_auc</span></span>
+<span id="cb22-6"><a></a><span class="fu">model_metric_lower_better</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb22-7"><a></a><span class="fu">metrics_threshold</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.01</span></span>
+<span id="cb22-8"><a></a></span>
+<span id="cb22-9"><a></a><span class="fu">model_conf</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb22-10"><a></a><span class="fu">features_conf</span><span class="kw">:</span><span class="at"> ${.model_conf.features}</span></span>
+<span id="cb22-11"><a></a></span>
+<span id="cb22-12"><a></a><span class="fu">model_registry_conf</span><span class="kw">:</span></span>
+<span id="cb22-13"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.model_registry.mlflow_registry.MLFlowModelRegistry</span></span>
+<span id="cb22-14"><a></a></span>
+<span id="cb22-15"><a></a><span class="fu">data_reader_fit_conf</span><span class="kw">:</span></span>
+<span id="cb22-16"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.data_reader.bq.SnapshotBQDataReader</span></span>
+<span id="cb22-17"><a></a><span class="at">  </span><span class="fu">table_ref</span><span class="kw">:</span><span class="at"> ${vars.table_features_ref}</span></span>
+<span id="cb22-18"><a></a><span class="at">  </span><span class="fu">project_id</span><span class="kw">:</span><span class="at"> ${vars.project_id}</span></span>
+<span id="cb22-19"><a></a><span class="at">  </span><span class="fu">column_id</span><span class="kw">:</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb22-20"><a></a><span class="at">  </span><span class="fu">column_snapshot_date</span><span class="kw">:</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb22-21"><a></a><span class="at">  </span><span class="fu">column_snaphot_id</span><span class="kw">:</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb22-22"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-23"><a></a><span class="at">  </span><span class="fu">snaphots_range</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">5</span><span class="kw">,</span><span class="dv">6</span><span class="kw">]</span></span>
+<span id="cb22-24"><a></a></span>
+<span id="cb22-25"><a></a><span class="fu">data_reader_test_conf</span><span class="kw">:</span></span>
+<span id="cb22-26"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.data_reader.bq.SnapshotBQDataReader</span></span>
+<span id="cb22-27"><a></a><span class="at">  </span><span class="fu">table_ref</span><span class="kw">:</span><span class="at"> ${vars.table_features_ref}</span></span>
+<span id="cb22-28"><a></a><span class="at">  </span><span class="fu">project_id</span><span class="kw">:</span><span class="at"> ${vars.project_id}</span></span>
+<span id="cb22-29"><a></a><span class="at">  </span><span class="fu">column_id</span><span class="kw">:</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb22-30"><a></a><span class="at">  </span><span class="fu">column_snapshot_date</span><span class="kw">:</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb22-31"><a></a><span class="at">  </span><span class="fu">column_snaphot_id</span><span class="kw">:</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb22-32"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-33"><a></a><span class="at">  </span><span class="fu">snaphots_range</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">3</span><span class="kw">,</span><span class="dv">4</span><span class="kw">]</span></span>
+<span id="cb22-34"><a></a></span>
+<span id="cb22-35"><a></a><span class="fu">data_splitter_conf</span><span class="kw">:</span></span>
+<span id="cb22-36"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.data_splitter.snapshot_balanced_splitter.SnapshotBalancedSplitter</span></span>
+<span id="cb22-37"><a></a><span class="at">  </span><span class="fu">column_id</span><span class="kw">:</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb22-38"><a></a><span class="at">  </span><span class="fu">column_snapshot</span><span class="kw">:</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb22-39"><a></a><span class="at">  </span><span class="fu">ratio</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.3</span></span>
+<span id="cb22-40"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-41"><a></a></span>
+<span id="cb22-42"><a></a><span class="fu">do_hpo</span><span class="kw">:</span><span class="at"> </span><span class="ch">False</span></span>
+<span id="cb22-43"><a></a><span class="fu">hpo_conf</span><span class="kw">:</span></span>
+<span id="cb22-44"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.hpo.optuna.OptunaHandler</span></span>
+<span id="cb22-45"><a></a><span class="at">  </span><span class="fu">path</span><span class="kw">:</span><span class="at"> </span><span class="st">""</span></span>
+<span id="cb22-46"><a></a></span>
+<span id="cb22-47"><a></a><span class="fu">model_inferer_conf</span><span class="kw">:</span></span>
+<span id="cb22-48"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.model_inferer.default.ModelInferer</span></span>
+<span id="cb22-49"><a></a><span class="at">  </span><span class="fu">column_prediction</span><span class="kw">:</span><span class="at"> ${vars.column_prediction}</span></span>
+<span id="cb22-50"><a></a><span class="at">  </span><span class="fu">column_model_id</span><span class="kw">:</span><span class="at"> ${vars.column_model_id}</span></span>
+<span id="cb22-51"><a></a><span class="at">  </span><span class="fu">columns_keep</span><span class="kw">:</span></span>
+<span id="cb22-52"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb22-53"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb22-54"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb22-55"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-56"><a></a></span>
+<span id="cb22-57"><a></a><span class="fu">evaluator_conf</span><span class="kw">:</span></span>
+<span id="cb22-58"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.generic.Evaluator</span></span>
+<span id="cb22-59"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-60"><a></a><span class="at">  </span><span class="fu">column_prediction</span><span class="kw">:</span><span class="at"> ${vars.column_prediction}</span></span>
+<span id="cb22-61"><a></a><span class="at">  </span><span class="fu">metric_calculators</span><span class="kw">:</span></span>
+<span id="cb22-62"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.metrics_calculator.generic.MetricsCalculator</span></span>
+<span id="cb22-63"><a></a><span class="at">      </span><span class="fu">metric_functions</span><span class="kw">:</span></span>
+<span id="cb22-64"><a></a><span class="at">        </span><span class="fu">pr_auc</span><span class="kw">:</span></span>
+<span id="cb22-65"><a></a><span class="at">          </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC</span></span>
+<span id="cb22-66"><a></a><span class="at">          </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="cb22-67"><a></a></span>
+<span id="cb22-68"><a></a><span class="at">  </span><span class="fu">thresholded_metric_calculators</span><span class="kw">:</span></span>
+<span id="cb22-69"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.metrics_calculator.generic.ThresholdedMetricsCalculator</span></span>
+<span id="cb22-70"><a></a><span class="at">      </span><span class="fu">metric_functions</span><span class="kw">:</span></span>
+<span id="cb22-71"><a></a><span class="at">        </span><span class="fu">precision_score</span><span class="kw">:</span></span>
+<span id="cb22-72"><a></a><span class="at">          </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> sklearn.metrics.precision_score</span></span>
+<span id="cb22-73"><a></a><span class="at">          </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-74"><a></a><span class="at">        </span><span class="fu">recall_score</span><span class="kw">:</span></span>
+<span id="cb22-75"><a></a><span class="at">          </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> sklearn.metrics.recall_score</span></span>
+<span id="cb22-76"><a></a><span class="at">          </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-77"><a></a><span class="at">        </span><span class="fu">accuracy_score</span><span class="kw">:</span></span>
+<span id="cb22-78"><a></a><span class="at">          </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> sklearn.metrics.accuracy_score</span></span>
+<span id="cb22-79"><a></a><span class="at">          </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-80"><a></a><span class="at">        </span><span class="fu">f1_score</span><span class="kw">:</span></span>
+<span id="cb22-81"><a></a><span class="at">          </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> sklearn.metrics.f1_score</span></span>
+<span id="cb22-82"><a></a><span class="at">          </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-83"><a></a></span>
+<span id="cb22-84"><a></a><span class="at">  </span><span class="fu">plots</span><span class="kw">:</span></span>
+<span id="cb22-85"><a></a><span class="at">    </span><span class="fu">density_curve</span><span class="kw">:</span></span>
+<span id="cb22-86"><a></a><span class="at">      </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.plots.generic.DensityCurvePlot</span></span>
+<span id="cb22-87"><a></a><span class="at">      </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-88"><a></a><span class="at">    </span><span class="fu">pr_curve</span><span class="kw">:</span></span>
+<span id="cb22-89"><a></a><span class="at">      </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.plots.generic.PRCurvePlot</span></span>
+<span id="cb22-90"><a></a><span class="at">      </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb22-91"><a></a></span>
+<span id="cb22-92"><a></a><span class="fu">evaluator_group_conf</span><span class="kw">:</span></span>
+<span id="cb22-93"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.generic.GroupedEvaluator</span></span>
+<span id="cb22-94"><a></a><span class="at">  </span><span class="fu">columns_groupby</span><span class="kw">:</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb22-95"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb22-96"><a></a><span class="at">  </span><span class="fu">column_prediction</span><span class="kw">:</span><span class="at"> ${vars.column_prediction}</span></span>
+<span id="cb22-97"><a></a><span class="at">  </span><span class="fu">metric_calculators</span><span class="kw">:</span></span>
+<span id="cb22-98"><a></a><span class="at">    </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.metrics_calculator.generic.MetricsCalculator</span></span>
+<span id="cb22-99"><a></a><span class="at">    </span><span class="fu">metric_functions</span><span class="kw">:</span></span>
+<span id="cb22-100"><a></a><span class="at">      </span><span class="fu">pr_auc</span><span class="kw">:</span></span>
+<span id="cb22-101"><a></a><span class="at">        </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC</span></span>
+<span id="cb22-102"><a></a><span class="at">        </span><span class="fu">_partial_</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment fade-in-then-out" data-fragment-index="6">
+<p>Pipeline Step Configs. Infer</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb23-1"><a></a><span class="co"># conf/default/pipeline_kwargs/infer.yaml</span></span>
+<span id="cb23-2"><a></a></span>
+<span id="cb23-3"><a></a><span class="fu">model_id</span><span class="kw">:</span><span class="at"> model_id</span></span>
+<span id="cb23-4"><a></a><span class="fu">model_stage</span><span class="kw">:</span><span class="at"> Production</span></span>
+<span id="cb23-5"><a></a></span>
+<span id="cb23-6"><a></a><span class="fu">model_conf</span><span class="kw">:</span><span class="at"> </span><span class="kw">???</span></span>
+<span id="cb23-7"><a></a></span>
+<span id="cb23-8"><a></a><span class="fu">features_conf</span><span class="kw">:</span><span class="at"> ${.model_conf.features}</span></span>
+<span id="cb23-9"><a></a></span>
+<span id="cb23-10"><a></a><span class="fu">model_registry_conf</span><span class="kw">:</span></span>
+<span id="cb23-11"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.model_registry.mlflow_registry.MLFlowModelRegistry</span></span>
+<span id="cb23-12"><a></a></span>
+<span id="cb23-13"><a></a><span class="fu">data_reader_infer_conf</span><span class="kw">:</span></span>
+<span id="cb23-14"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.data_reader.bq.SnapshotBQDataReader</span></span>
+<span id="cb23-15"><a></a><span class="at">  </span><span class="fu">table_ref</span><span class="kw">:</span><span class="at"> ${vars.table_features_ref}</span></span>
+<span id="cb23-16"><a></a><span class="at">  </span><span class="fu">project_id</span><span class="kw">:</span><span class="at"> ${vars.project_id}</span></span>
+<span id="cb23-17"><a></a><span class="at">  </span><span class="fu">column_id</span><span class="kw">:</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb23-18"><a></a><span class="at">  </span><span class="fu">column_snapshot_date</span><span class="kw">:</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb23-19"><a></a><span class="at">  </span><span class="fu">column_snaphot_id</span><span class="kw">:</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb23-20"><a></a><span class="at">  </span><span class="fu">column_target</span><span class="kw">:</span><span class="at"> ${..model_conf.column_target}</span></span>
+<span id="cb23-21"><a></a><span class="at">  </span><span class="fu">snaphots_range</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="dv">1</span><span class="kw">,</span><span class="dv">1</span><span class="kw">]</span></span>
+<span id="cb23-22"><a></a></span>
+<span id="cb23-23"><a></a><span class="fu">model_inferer_conf</span><span class="kw">:</span></span>
+<span id="cb23-24"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.model_inferer.default.ModelInferer</span></span>
+<span id="cb23-25"><a></a><span class="at">  </span><span class="fu">column_prediction</span><span class="kw">:</span><span class="at"> ${vars.column_prediction}</span></span>
+<span id="cb23-26"><a></a><span class="at">  </span><span class="fu">column_model_id</span><span class="kw">:</span><span class="at"> ${vars.column_model_id}</span></span>
+<span id="cb23-27"><a></a><span class="at">  </span><span class="fu">columns_keep</span><span class="kw">:</span></span>
+<span id="cb23-28"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb23-29"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb23-30"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_snaphot_id}</span></span>
+<span id="cb23-31"><a></a></span>
+<span id="cb23-32"><a></a><span class="fu">data_writer_conf</span><span class="kw">:</span></span>
+<span id="cb23-33"><a></a><span class="at">  </span><span class="fu">_target_</span><span class="kw">:</span><span class="at"> flavors.data_writer.bq.BQDataWriter</span></span>
+<span id="cb23-34"><a></a><span class="at">  </span><span class="fu">project_id</span><span class="kw">:</span><span class="at"> ${vars.project_id}</span></span>
+<span id="cb23-35"><a></a><span class="at">  </span><span class="fu">table_ref</span><span class="kw">:</span><span class="at"> ${vars.table_scores_ref}</span></span>
+<span id="cb23-36"><a></a><span class="at">  </span><span class="fu">column_timestamp</span><span class="kw">:</span><span class="at"> ${vars.column_timestamp}</span></span>
+<span id="cb23-37"><a></a><span class="at">  </span><span class="fu">columns</span><span class="kw">:</span></span>
+<span id="cb23-38"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_id}</span></span>
+<span id="cb23-39"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_snapshot_date}</span></span>
+<span id="cb23-40"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_prediction}</span></span>
+<span id="cb23-41"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_model_id}</span></span>
+<span id="cb23-42"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> ${vars.column_timestamp}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div></div>
+<p class="heading" id="section-7"></p>
+</section>
+<section id="even-more-realistic-example.-config-templating-1" class="slide level2">
+<h2><strong>Even more</strong> realistic example. Config Templating</h2>
+<div class="columns">
+<div class="column" style="width:33%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="img/ex4_dir_tree_2.png" class="quarto-figure quarto-figure-center"></p>
+</figure>
+</div>
+</div><div class="column" style="width:66%;">
+<div class="fragment fade-in-then-out" data-fragment-index="1">
+<div class="sourceCode" id="cb24"><pre class="sourceCode numberSource yaml number-lines code-with-copy"><code class="sourceCode yaml"><span id="cb24-1"><a></a><span class="co"># conf/default/pipeline_options/train.yaml</span></span>
+<span id="cb24-2"><a></a></span>
+<span id="cb24-3"><a></a><span class="fu">defaults</span><span class="kw">:</span></span>
+<span id="cb24-4"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">pipeline</span><span class="kw">:</span><span class="at"> train</span></span>
+<span id="cb24-5"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">model@pipeline.kwargs.model_conf</span><span class="kw">:</span><span class="at"> model</span></span>
+<span id="cb24-6"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">default/zenml_settings@pipeline.settings</span><span class="kw">:</span><span class="at"> 3-10</span></span>
+<span id="cb24-7"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> default/vars@vars</span></span>
+<span id="cb24-8"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> vars@vars</span></span>
+<span id="cb24-9"><a></a><span class="at">  </span><span class="kw">-</span><span class="at"> _self_</span></span>
+<span id="cb24-10"><a></a></span>
+<span id="cb24-11"><a></a><span class="fu">hydra</span><span class="kw">:</span></span>
+<span id="cb24-12"><a></a><span class="at">  </span><span class="fu">searchpath</span><span class="kw">:</span><span class="co"> # add extra paths to the search path</span></span>
+<span id="cb24-13"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> file://.</span><span class="co"> # src/</span></span>
+<span id="cb24-14"><a></a><span class="at">    </span><span class="kw">-</span><span class="at"> file://./conf/</span></span>
+<span id="cb24-15"><a></a></span>
+<span id="cb24-16"><a></a><span class="fu">environment</span><span class="kw">:</span><span class="at"> dev</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div></div>
+<p class="heading" id="section-8"></p>
+</section></section>
+<section id="thats-it" class="title-slide slide level1 center">
+<h1><strong>That’s it !</strong></h1>
+
+
+
+<img data-src="img/eng_hydra.jpg" class="quarto-figure quarto-figure-center r-stretch"></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

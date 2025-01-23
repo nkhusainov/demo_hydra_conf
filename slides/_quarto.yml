@@ -1,6 +1,7 @@
 project:
   title: "Config Management with Hydra"
-  output-dir: generated
+  type: website
+  output-dir: rendered
   render:
     - slides.qmd
   resources:
