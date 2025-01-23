@@ -1,0 +1,20 @@
+defaults:
+  - default
+  - _self_
+
+model:
+  features:
+    numerical:
+      - num_1
+      - num_2
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_1-project
+    prod: prod-case_1-project
+
+  options_table_features:
+    dev: "case_1_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"

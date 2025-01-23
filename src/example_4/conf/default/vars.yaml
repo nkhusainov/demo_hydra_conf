@@ -1,0 +1,29 @@
+options_project_id:
+  dev: ???
+  prd: ???
+
+options_table_features_ref:
+  dev: ???
+  prd: ???
+
+options_table_scores_ref:
+  dev: ???
+  prd: ???
+
+options_schedule:
+  train:
+  retrain: "0 10 * * 5"
+  infer: "45 7 * * 1"
+
+env: ${environment}
+project_id: ${.options_project_id[${.env}]}
+table_features_ref: ${.options_table_features_ref.${.env}}
+table_scores_ref: ${.options_table_scores_ref.${.env}}
+
+column_id: customer_id
+column_model_id: model_id
+column_prediction: pred_proba
+column_snapshot_date: snapshot_dt
+column_snaphot_id: snapshot_id
+column_dataset_type: dataset_type
+column_timestamp: created_dttp

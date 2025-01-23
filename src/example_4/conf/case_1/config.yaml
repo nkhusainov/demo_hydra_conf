@@ -1,0 +1,14 @@
+defaults:
+  - pipeline: train
+  - model@pipeline.kwargs.model_conf: model
+  - default/zenml_settings@pipeline.settings: 3-10
+  - default/vars@vars
+  - vars@vars
+  - _self_
+
+hydra:
+  searchpath: # add extra paths to the search path
+    - file://. # src/
+    - file://./conf/
+
+environment: dev

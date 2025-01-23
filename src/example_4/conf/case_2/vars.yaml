@@ -1,0 +1,15 @@
+options_project_id:
+  dev: "case_2_project_dev"
+  prd: "case_2_project_prd"
+
+options_table_features_ref:
+  dev: "case_2_dataset_dev.feature_table_name"
+  prd: "case_2_dataset_prd.feature_table_name"
+
+options_table_scores_ref:
+  dev: "case_2_dataset_dev.scores_table_name"
+  prd: "case_2_dataset_prd.scores_table_name"
+
+options_schedule:
+  retrain: "0 10 * * 5"
+  infer: "45 7 * * 1"

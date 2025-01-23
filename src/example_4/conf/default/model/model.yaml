@@ -1,0 +1,7 @@
+objective: binary
+is_unbalance: True
+extra_trees: False
+boosting_type: gbdt
+feature_fraction: 0.6
+feature_fraction_bynode: 0.95
+learning_rate: 0.034744

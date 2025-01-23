@@ -1,0 +1,28 @@
+# simple variable definition
+var_1: hello
+var_2: world
+environment: dev
+
+# referencing
+var_constr: ${var_1}_${var_2}
+
+# dictionary
+my_dict:
+  key_1: ${var_1}
+  key_2: ${var_2}
+
+# list
+my_list:
+  - ${var_1}
+  - ${var_2}
+
+# env variable
+hostname: ${oc.env:HOSTNAME}
+password: ${oc.env:PASSWORD}
+
+# environment dependent variables
+gcp_project_options:
+  dev: dev-project
+  prod: prod-project
+
+gcp_project: ${gcp_project_options.${environment}}

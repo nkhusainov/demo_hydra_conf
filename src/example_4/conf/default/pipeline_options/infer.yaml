@@ -1,0 +1,11 @@
+step_configurations:
+  read_data_infer:
+    settings:
+      resources:
+        cpu_count: 8
+        memory: "64GiB"
+  infer_model:
+    settings:
+      resources:
+        cpu_count: 8
+        memory: "64GiB"

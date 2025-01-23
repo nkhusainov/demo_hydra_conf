@@ -1,0 +1,40 @@
+model_id: model_id
+model_stage: Production
+
+model_conf: ???
+
+features_conf: ${.model_conf.features}
+
+model_registry_conf:
+  _target_: flavors.model_registry.mlflow_registry.MLFlowModelRegistry
+
+data_reader_infer_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [1,1]
+
+model_inferer_conf:
+  _target_: flavors.model_inferer.default.ModelInferer
+  column_prediction: ${vars.column_prediction}
+  column_model_id: ${vars.column_model_id}
+  columns_keep:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_snaphot_id}
+
+data_writer_conf:
+  _target_: flavors.data_writer.bq.BQDataWriter
+  project_id: ${vars.project_id}
+  table_ref: ${vars.table_scores_ref}
+  column_timestamp: ${vars.column_timestamp}
+  columns:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_prediction}
+    - ${vars.column_model_id}
+    - ${vars.column_timestamp}

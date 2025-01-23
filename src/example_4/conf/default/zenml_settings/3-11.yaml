@@ -1,0 +1,19 @@
+docker:
+  parent_image: "path.jfrog.io/.../zenml-adeomlflow-py3.11:0.33.0"
+  replicate_local_python_environment:
+    - "poetry"
+    - "export"
+    - "--without=dev"
+    - "--extras=vertex"
+    - "--extras=ds_default"
+    - "--format=requirements.txt"
+  dockerignore: "../.dockerignore"
+  install_stack_requirements: False
+  apt_packages:
+    - libgomp1
+  environment:
+    PYTHONWARNINGS: "ignore"
+    NUMEXPR_MAX_THREADS: "128"
+    HYDRA_FULL_ERROR: 1
+  source_files: "include"
+  python_package_installer: "uv"

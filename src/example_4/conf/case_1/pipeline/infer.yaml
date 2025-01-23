@@ -1,0 +1,7 @@
+defaults:
+  - /default/pipeline_options@pipeline_options: infer
+  - /default/pipeline_kwargs@pipeline_kwargs: infer
+
+pipeline_kwargs:
+  data_reader_infer_conf:
+    snaphots_range: [1,1]

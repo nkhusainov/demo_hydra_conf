@@ -1,0 +1,6 @@
+defaults:
+  - usecase: case_1
+  - _self_
+
+environment: ${oc.env:ENVIRONMENT}
+gcp_project: ${usecase.pipeline_variables.gcp_project_options.${environment}}

@@ -1,0 +1,934 @@
+---
+title: "Hydra"
+author:
+  - name: "Nail Khusainov"
+format:
+  revealjs:
+    theme: [default, clean.scss]
+    menu:
+      side: left
+    slide-number: true
+    date-format: long
+
+subtitle: Intro to Hydra
+date: Janary 20, 2025
+lang: en
+output-file: slides.html
+---
+
+# Hydra. Config Management
+
+## Hydra
+![](img/hydra.png){fig-align="center"}
+
+::: {.r-stack}
+::: {.fragment .fade-in-then-out fragment-index=0}
+https://hydra.cc/
+
+Hydra is an open-source Python framework that simplifies the development of research and other complex applications. The key feature is the ability to don't read this, blahblah blah create a hierarchical blah blahblag realy, don't read this, it is not that interesting blahblah blah. The name Hydra comes from its ability to run multiple similar jobs - much like a Hydra with multiple heads.
+:::
+::: {.fragment .fade-in-then-out fragment-index=1}
+**Key features**
+
+- Hierarchical configuration composable from multiple sources
+- Configuration can be specified or overridden from the command line
+:::
+::: {.fragment .fade-in-then-out fragment-index=2}
+**When to use it ?**
+
+- You can scroll your config-file during 2 seconds
+- You are adapting configs according to envs, pipelines, etc.
+- It's only you who understands what is happening in the configs
+:::
+:::
+
+
+## Simple Example
+:::: {.columns}
+::: {.column width="70%" }
+```{.yaml code-line-numbers="1-28|1-3|1-6|1-3,8-11|1-3,13-16|18-20|22-28"}
+# simple variable definition
+var_1: hello
+var_2: world
+
+# referencing
+var_constr: ${var_1}_${var_2}
+
+# dictionary
+my_dict:
+  key_1: ${var_1}
+  key_2: ${var_2}
+
+# list
+my_list:
+  - ${var_1}
+  - ${var_2}
+
+# env variable
+hostname: ${oc.env:HOSTNAME}
+password: ${oc.env:PASSWORD}
+
+# environment dependent variables
+environment: dev
+gcp_project_options:
+  dev: dev-project
+  prod: prod-project
+
+gcp_project: ${gcp_project_options.${environment}}
+```
+:::
+::: {.column width="30%" }
+:::
+::::
+
+###################################################################################################
+
+## Simple Example. Access variables
+:::: {.columns}
+
+::: {.column width="50%" }
+::: {.fragment .fade-in fragment-index=1}
+```{.python fragment-index=2}
+# src/main.py
+
+import hydra
+from omegaconf import DictConfig, OmegaConf
+
+@hydra.main(
+    version_base=None,
+    config_path="conf",
+    config_name="config",
+)
+def my_app(cfg : DictConfig) -> None:
+    OmegaConf.resolve(cfg)
+    print(OmegaConf.to_yaml(cfg))
+
+
+if __name__ == "__main__":
+    my_app()
+```
+:::
+::: {.r-stack}
+::: {.fragment .fade-in-then-out fragment-index=5}
+Simple execution
+```{.sh}
+python main.py
+```
+:::
+::: {.fragment .fade-in-then-out fragment-index=6}
+**Change** or **add** variables at **runtime** !
+```{.sh}
+python main.py var_1=bonjour var_2=le_monde
+```
+:::
+:::
+:::
+
+::: {.column width="50%" }
+::: {.fragment .fade-in fragment-index=3}
+![](img/ex1_dir_tree.png){fig-align="center"}s
+:::
+:::
+
+::::
+:::
+:::
+
+
+###################################################################################################
+##
+
+![](img/cli_choice.jpg){fig-align="center"}
+
+
+###################################################################################################
+## Realistic example. Diferent configs between Usecases
+:::: {.columns}
+::: {.column width="33%"}
+::: {.fragment .fade-in fragment-index=1}
+```{.yaml}
+# CASE 1
+# src/conf/usecases/case_1.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+  features:
+    categorical:
+      - cat_1
+    numerical:
+      - num_1
+      - num_2
+      - num_3
+      - num_4
+      - num_5
+      - num_6
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_2-project
+    prod: prod-case_2-project
+
+  options_table_features:
+    dev: "case_2_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+:::
+
+::: {.column width="33%"}
+::: {.fragment .fade-in fragment-index=2}
+```{.yaml code-line-numbers="|4-14"}
+# CASE 2
+# src/conf/usecases/case_2.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    min_data_in_bin: 885
+    min_data_in_leaf: 595
+    num_leaves: 475
+    sigmoid: 8.3
+    num_iterations: 290
+  features:
+    categorical:
+      - cat_1
+    numerical:
+      - num_1
+      - num_2
+      - num_3
+      - num_4
+      - num_5
+      - num_6
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_1-project
+    prod: prod-case_1-project
+
+  options_table_features:
+    dev: "case_1_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+:::
+
+::: {.column width="33%"}
+::: {.fragment .fade-in fragment-index=3}
+```{.yaml code-line-numbers="|20-29"}
+# CASE 3
+# src/conf/usecases/case_3.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+    max_bin: 107
+    max_depth: 8
+    min_data_in_bin: 885
+    min_data_in_leaf: 595
+    num_leaves: 475
+    sigmoid: 8.3
+    num_iterations: 290
+  features:
+    categorical:
+      - cat_1
+      - cat_2
+      - cat_3
+      - cat_4
+      - cat_5
+    numerical:
+      - num_1
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_3-project
+    prod: prod-case_3-project
+
+  options_table_features:
+    dev: "case_3_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+:::
+
+::::
+
+## Realistic example
+:::: {.columns}
+
+::: {.column width="50%" }
+::: {.fragment fragment-index=0}
+![](img/ex2_dir_tree.png){fig-align="center"}
+:::
+
+::: {.r-stack}
+::: {.fragment .fade-in-then-out fragment-index=2}
+
+```{.sh}
+python main.py
+```
+:::
+::: {.fragment .fade-in-then-out fragment-index=3}
+Importing another config
+```{.sh}
+python main.py usecase=case_2 environment=prod
+```
+:::
+:::
+
+:::
+
+::: {.column width="50%" }
+::: {.fragment .fade-in fragment-index=1}
+```{.yaml fragment-index=2}
+# MAIN CONFIG
+# src/conf/config.yaml
+
+defaults:
+  - usecase: case_1
+
+environment: ${oc.env:ENVIRONMENT}
+gcp_project: ${usecase.pipeline_variables.gcp_project_options.${environment}}
+```
+:::
+:::
+
+::::
+
+
+
+## **A more** realistic example
+
+We **don't want to repeat** the same **config** multiple times.
+
+:::: {.columns}
+::: {.column width="33%"}
+```{.yaml code-line-numbers="|1-10,13-14,16,23,25-34"}
+# CASE 1
+# src/conf/usecases/case_1.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+  features:
+    categorical:
+      - cat_1
+    numerical:
+      - num_1
+      - num_2
+      - num_3
+      - num_4
+      - num_5
+      - num_6
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_2-project
+    prod: prod-case_2-project
+
+  options_table_features:
+    dev: "case_2_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+
+::: {.column width="33%"}
+```{.yaml code-line-numbers="|1-10,18,19,21,28,30-39"}
+# CASE 2
+# src/conf/usecases/case_2.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+    min_data_in_bin: 885
+    min_data_in_leaf: 595
+    num_leaves: 475
+    sigmoid: 8.3
+    num_iterations: 290
+  features:
+    categorical:
+      - cat_1
+    numerical:
+      - num_1
+      - num_2
+      - num_3
+      - num_4
+      - num_5
+      - num_6
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_1-project
+    prod: prod-case_1-project
+
+  options_table_features:
+    dev: "case_1_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+
+::: {.column width="33%"}
+```{.yaml code-line-numbers="|1-10,20,21,27,29,31-40"}
+# CASE 3
+# src/conf/usecases/case_3.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+    max_bin: 107
+    max_depth: 8
+    min_data_in_bin: 885
+    min_data_in_leaf: 595
+    num_leaves: 475
+    sigmoid: 8.3
+    num_iterations: 290
+  features:
+    categorical:
+      - cat_1
+      - cat_2
+      - cat_3
+      - cat_4
+      - cat_5
+    numerical:
+      - num_1
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_3-project
+    prod: prod-case_3-project
+
+  options_table_features:
+    dev: "case_3_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+
+::::
+
+
+## **A more** realistic example. Config Templating
+We have multiple templates. (e.g Train / Infer)
+
+:::: {.columns}
+::: {.column width="33%"}
+```{.yaml}
+# DEFAULT CONFIG
+# src/conf/usecases/default.yaml
+
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+  features:
+    categorical:
+      - cat_1
+      - cat_2
+    numerical:
+      - num_1
+      - num_2
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: ???
+    prod: ???
+
+  options_table_features:
+    dev: ???
+    prd: ${.dev}
+
+  schedule: ???
+```
+:::
+
+::: {.column width="33%"}
+```{.yaml code-line-numbers="|4-6|8-12|16-17,20-21,23"}
+# CASE 1
+# src/conf/usecases/case_1.yaml
+
+defaults:
+  - default
+  - _self_
+
+model:
+  features:
+    numerical:
+      - num_3
+      - num_4
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_1-project
+    prod: prod-case_1-project
+
+  options_table_features:
+    dev: "case_1_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"
+```
+:::
+
+::: {.column width="33%"}
+```{.yaml}
+# MAIN CONFIG
+# src/conf/config.yaml
+
+defaults:
+  - usecase: case_1
+  - _self_
+
+environment: ${oc.env:ENVIRONMENT}
+gcp_project: ${usecase.pipeline_variables.gcp_project_options.${environment}}
+```
+:::
+
+::::
+
+Run:
+```{.sh}
+python main.py
+```
+
+###################################################################################################
+##
+::: {.fragment .fade-in fragment-index=1}
+![](img/eng_yaml.jpg){fig-align="center"}
+:::
+
+
+
+###################################################################################################
+## **Even more** realistic example. Config Templating
+:::: {.columns}
+::: {.column width="33%"}
+![](img/ex4_dir_tree.png){fig-align="center"}
+:::
+
+::: {.column width="66%"}
+::: {.r-stack}
+::: {.fragment .fade-in-then-out fragment-index=1}
+ZenML Resources. Train
+
+```{.yaml}
+# conf/default/pipeline_options/train.yaml
+
+step_configurations:
+  read_data_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  read_data_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  split_data:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  train_model:
+    settings:
+      resources:
+        cpu_count: 32.0
+        memory: 256GiB
+  infer_model_train:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_validate:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_train:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_validate:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  eval_by_snapshot_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  eval_by_snapshot_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  rotate_models:
+    settings:
+      resources:
+        cpu_count: 2.0
+        memory: 2GiB
+  report_overal:
+    settings:
+      resources:
+        cpu_count: 2.0
+        memory: 2GiB
+```
+:::
+
+::: {.fragment .fade-in-then-out fragment-index=2}
+ZenML Resources. Infer
+
+```{.yaml}
+# conf/default/pipeline_options/infer.yaml
+
+step_configurations:
+  read_data_infer:
+    settings:
+      resources:
+        cpu_count: 8
+        memory: "64GiB"
+  infer_model:
+    settings:
+      resources:
+        cpu_count: 8
+        memory: "64GiB"
+
+```
+:::
+
+
+::: {.fragment .fade-in-then-out fragment-index=3}
+ZenML Docker. Python 3.10
+
+```{.yaml}
+# conf/default/zenml_settings/3-10.yaml
+
+docker:
+  parent_image: "path.jfrog.io/.../zenml-adeomlflow-py3.10:0.33.0"
+  replicate_local_python_environment:
+    - "poetry"
+    - "export"
+    - "--without=dev"
+    - "--extras=vertex"
+    - "--extras=ds_default"
+    - "--format=requirements.txt"
+  dockerignore: "../.dockerignore"
+  install_stack_requirements: False
+  apt_packages:
+    - libgomp1
+  environment:
+    PYTHONWARNINGS: "ignore"
+    NUMEXPR_MAX_THREADS: "128"
+    HYDRA_FULL_ERROR: 1
+  source_files: "include"
+  python_package_installer: "uv"
+
+```
+:::
+
+::: {.fragment .fade-in-then-out fragment-index=4}
+ZenML Docker. Python 3.11
+
+```{.yaml}
+# conf/default/zenml_settings/3-11.yaml
+
+docker:
+  parent_image: "path.jfrog.io/.../zenml-adeomlflow-py3.11:0.33.0"
+  replicate_local_python_environment:
+    - "poetry"
+    - "export"
+    - "--without=dev"
+    - "--extras=vertex"
+    - "--extras=ds_default"
+    - "--format=requirements.txt"
+  dockerignore: "../.dockerignore"
+  install_stack_requirements: False
+  apt_packages:
+    - libgomp1
+  environment:
+    PYTHONWARNINGS: "ignore"
+    NUMEXPR_MAX_THREADS: "128"
+    HYDRA_FULL_ERROR: 1
+  source_files: "include"
+  python_package_installer: "uv"
+
+```
+:::
+
+::: {.fragment .fade-in-then-out fragment-index=5}
+Pipeline Step Configs. Train
+
+```{.yaml}
+# conf/default/pipeline_kwargs/train.yaml
+
+model_id: ???
+model_stage: Production
+model_target_metric: pr_auc
+model_metric_lower_better: False
+metrics_threshold: 0.01
+
+model_conf: ???
+features_conf: ${.model_conf.features}
+
+model_registry_conf:
+  _target_: flavors.model_registry.mlflow_registry.MLFlowModelRegistry
+
+data_reader_fit_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [5,6]
+
+data_reader_test_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [3,4]
+
+data_splitter_conf:
+  _target_: flavors.data_splitter.snapshot_balanced_splitter.SnapshotBalancedSplitter
+  column_id: ${vars.column_id}
+  column_snapshot: ${vars.column_snaphot_id}
+  ratio: 0.3
+  column_target: ${..model_conf.column_target}
+
+do_hpo: False
+hpo_conf:
+  _target_: flavors.hpo.optuna.OptunaHandler
+  path: ""
+
+model_inferer_conf:
+  _target_: flavors.model_inferer.default.ModelInferer
+  column_prediction: ${vars.column_prediction}
+  column_model_id: ${vars.column_model_id}
+  columns_keep:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+
+evaluator_conf:
+  _target_: flavors.evaluator.generic.Evaluator
+  column_target: ${..model_conf.column_target}
+  column_prediction: ${vars.column_prediction}
+  metric_calculators:
+    - _target_: flavors.evaluator.metrics_calculator.generic.MetricsCalculator
+      metric_functions:
+        pr_auc:
+          _target_: flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC
+          _partial_: false
+
+  thresholded_metric_calculators:
+    - _target_: flavors.evaluator.metrics_calculator.generic.ThresholdedMetricsCalculator
+      metric_functions:
+        precision_score:
+          _target_: sklearn.metrics.precision_score
+          _partial_: true
+        recall_score:
+          _target_: sklearn.metrics.recall_score
+          _partial_: true
+        accuracy_score:
+          _target_: sklearn.metrics.accuracy_score
+          _partial_: true
+        f1_score:
+          _target_: sklearn.metrics.f1_score
+          _partial_: true
+
+  plots:
+    density_curve:
+      _target_: flavors.evaluator.plots.generic.DensityCurvePlot
+      _partial_: true
+    pr_curve:
+      _target_: flavors.evaluator.plots.generic.PRCurvePlot
+      _partial_: true
+
+evaluator_group_conf:
+  _target_: flavors.evaluator.generic.GroupedEvaluator
+  columns_groupby: ${vars.column_snapshot_date}
+  column_target: ${..model_conf.column_target}
+  column_prediction: ${vars.column_prediction}
+  metric_calculators:
+    _target_: flavors.evaluator.metrics_calculator.generic.MetricsCalculator
+    metric_functions:
+      pr_auc:
+        _target_: flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC
+        _partial_: false
+
+```
+:::
+
+::: {.fragment .fade-in-then-out fragment-index=6}
+Pipeline Step Configs. Infer
+
+```{.yaml}
+# conf/default/pipeline_kwargs/infer.yaml
+
+model_id: model_id
+model_stage: Production
+
+model_conf: ???
+
+features_conf: ${.model_conf.features}
+
+model_registry_conf:
+  _target_: flavors.model_registry.mlflow_registry.MLFlowModelRegistry
+
+data_reader_infer_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [1,1]
+
+model_inferer_conf:
+  _target_: flavors.model_inferer.default.ModelInferer
+  column_prediction: ${vars.column_prediction}
+  column_model_id: ${vars.column_model_id}
+  columns_keep:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_snaphot_id}
+
+data_writer_conf:
+  _target_: flavors.data_writer.bq.BQDataWriter
+  project_id: ${vars.project_id}
+  table_ref: ${vars.table_scores_ref}
+  column_timestamp: ${vars.column_timestamp}
+  columns:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_prediction}
+    - ${vars.column_model_id}
+    - ${vars.column_timestamp}
+
+```
+:::
+:::
+:::
+::::
+
+
+###################################################################################################
+## **Even more** realistic example. Config Templating
+:::: {.columns}
+::: {.column width="33%"}
+![](img/ex4_dir_tree_2.png){fig-align="center"}
+:::
+
+::: {.column width="66%"}
+::: {.fragment .fade-in-then-out fragment-index=1}
+```{.yaml}
+# conf/default/pipeline_options/train.yaml
+
+defaults:
+  - pipeline: train
+  - model@pipeline.kwargs.model_conf: model
+  - default/zenml_settings@pipeline.settings: 3-10
+  - default/vars@vars
+  - vars@vars
+  - _self_
+
+hydra:
+  searchpath: # add extra paths to the search path
+    - file://. # src/
+    - file://./conf/
+
+environment: dev
+```
+:::
+:::
+::::
+
+###################################################################################################
+# **That's it !**
+![](img/eng_hydra.jpg){fig-align="center"}
+

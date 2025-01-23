@@ -1,0 +1,7 @@
+defaults:
+  - /default/pipeline_options@pipeline_options: train
+  - /default/pipeline_kwargs@pipeline_kwargs: train
+
+pipeline_kwargs:
+  data_reader_infer_conf:
+    snaphots_range: [2,60]

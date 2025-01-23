@@ -1,0 +1,31 @@
+model:
+  parameters:
+    objective: binary
+    is_unbalance: True
+    extra_trees: False
+    boosting_type: gbdt
+    feature_fraction: 0.6
+    feature_fraction_bynode: 0.95
+    learning_rate: 0.034744
+  features:
+    categorical:
+      - cat_1
+    numerical:
+      - num_1
+      - num_2
+      - num_3
+      - num_4
+      - num_5
+      - num_6
+    target: my_target_column
+
+pipeline_variables:
+  gcp_project_options:
+    dev: dev-case_2-project
+    prod: prod-case_2-project
+
+  options_table_features:
+    dev: "case1_dataset.features_table"
+    prd: ${.dev}
+
+  schedule: "0 0 * * *"

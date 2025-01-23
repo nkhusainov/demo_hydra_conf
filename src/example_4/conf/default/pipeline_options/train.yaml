@@ -1,0 +1,81 @@
+step_configurations:
+  read_data_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  read_data_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  split_data:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  train_model:
+    settings:
+      resources:
+        cpu_count: 32.0
+        memory: 256GiB
+  infer_model_train:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 256GiB
+  infer_model_validate:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_train:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  evaluate_validate:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  eval_by_snapshot_test:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  eval_by_snapshot_fit:
+    settings:
+      resources:
+        cpu_count: 8.0
+        memory: 128GiB
+  rotate_models:
+    settings:
+      resources:
+        cpu_count: 2.0
+        memory: 2GiB
+  report_overal:
+    settings:
+      resources:
+        cpu_count: 2.0
+        memory: 2GiB

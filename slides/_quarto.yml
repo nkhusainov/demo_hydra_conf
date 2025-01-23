@@ -1,0 +1,10 @@
+project:
+  title: "Config Management with Hydra"
+  output-dir: generated
+  render:
+    - slides.qmd
+  resources:
+    - "img/*"
+
+
+

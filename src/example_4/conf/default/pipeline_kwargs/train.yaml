@@ -1,0 +1,100 @@
+model_id: ???
+model_stage: Production
+model_target_metric: pr_auc
+model_metric_lower_better: False
+metrics_threshold: 0.01
+
+model_conf: ???
+features_conf: ${.model_conf.features}
+
+model_registry_conf:
+  _target_: flavors.model_registry.mlflow_registry.MLFlowModelRegistry
+
+data_reader_fit_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [5,6]
+
+data_reader_test_conf:
+  _target_: flavors.data_reader.bq.SnapshotBQDataReader
+  table_ref: ${vars.table_features_ref}
+  project_id: ${vars.project_id}
+  column_id: ${vars.column_id}
+  column_snapshot_date: ${vars.column_snapshot_date}
+  column_snaphot_id: ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+  snaphots_range: [3,4]
+
+data_splitter_conf:
+  _target_: flavors.data_splitter.snapshot_balanced_splitter.SnapshotBalancedSplitter
+  column_id: ${vars.column_id}
+  column_snapshot: ${vars.column_snaphot_id}
+  ratio: 0.3
+  column_target: ${..model_conf.column_target}
+
+do_hpo: False
+hpo_conf:
+  _target_: flavors.hpo.optuna.OptunaHandler
+  path: ""
+
+model_inferer_conf:
+  _target_: flavors.model_inferer.default.ModelInferer
+  column_prediction: ${vars.column_prediction}
+  column_model_id: ${vars.column_model_id}
+  columns_keep:
+    - ${vars.column_id}
+    - ${vars.column_snapshot_date}
+    - ${vars.column_snaphot_id}
+  column_target: ${..model_conf.column_target}
+
+evaluator_conf:
+  _target_: flavors.evaluator.generic.Evaluator
+  column_target: ${..model_conf.column_target}
+  column_prediction: ${vars.column_prediction}
+  metric_calculators:
+    - _target_: flavors.evaluator.metrics_calculator.generic.MetricsCalculator
+      metric_functions:
+        pr_auc:
+          _target_: flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC
+          _partial_: false
+
+  thresholded_metric_calculators:
+    - _target_: flavors.evaluator.metrics_calculator.generic.ThresholdedMetricsCalculator
+      metric_functions:
+        precision_score:
+          _target_: sklearn.metrics.precision_score
+          _partial_: true
+        recall_score:
+          _target_: sklearn.metrics.recall_score
+          _partial_: true
+        accuracy_score:
+          _target_: sklearn.metrics.accuracy_score
+          _partial_: true
+        f1_score:
+          _target_: sklearn.metrics.f1_score
+          _partial_: true
+
+  plots:
+    density_curve:
+      _target_: flavors.evaluator.plots.generic.DensityCurvePlot
+      _partial_: true
+    pr_curve:
+      _target_: flavors.evaluator.plots.generic.PRCurvePlot
+      _partial_: true
+
+evaluator_group_conf:
+  _target_: flavors.evaluator.generic.GroupedEvaluator
+  columns_groupby: ${vars.column_snapshot_date}
+  column_target: ${..model_conf.column_target}
+  column_prediction: ${vars.column_prediction}
+  metric_calculators:
+    _target_: flavors.evaluator.metrics_calculator.generic.MetricsCalculator
+    metric_functions:
+      pr_auc:
+        _target_: flavors.evaluator.custom_metrics.pr_auc.CustomPrecisionRecallAUC
+        _partial_: false
